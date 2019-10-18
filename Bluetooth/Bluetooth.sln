@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29411.108
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bluetooth", "Bluetooth.csproj", "{A856C4B7-7024-4326-9F8D-88FF847EABE0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A856C4B7-7024-4326-9F8D-88FF847EABE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A856C4B7-7024-4326-9F8D-88FF847EABE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A856C4B7-7024-4326-9F8D-88FF847EABE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A856C4B7-7024-4326-9F8D-88FF847EABE0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D1C96A4C-128C-432F-8EA5-8C951996F1BF}
+	EndGlobalSection
+EndGlobal
