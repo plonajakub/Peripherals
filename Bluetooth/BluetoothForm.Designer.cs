@@ -74,12 +74,13 @@
             // 
             // sendFileButton
             // 
-            this.sendFileButton.Location = new System.Drawing.Point(479, 450);
+            this.sendFileButton.Location = new System.Drawing.Point(275, 351);
             this.sendFileButton.Name = "sendFileButton";
-            this.sendFileButton.Size = new System.Drawing.Size(119, 38);
+            this.sendFileButton.Size = new System.Drawing.Size(98, 38);
             this.sendFileButton.TabIndex = 3;
             this.sendFileButton.Text = "Send file";
             this.sendFileButton.UseVisualStyleBackColor = true;
+            this.sendFileButton.Click += new System.EventHandler(this.SendFileButton_Click);
             // 
             // foundDevicesInfoLabel
             // 
@@ -103,7 +104,7 @@
             // logInfoLabel
             // 
             this.logInfoLabel.AutoSize = true;
-            this.logInfoLabel.Location = new System.Drawing.Point(653, 36);
+            this.logInfoLabel.Location = new System.Drawing.Point(737, 36);
             this.logInfoLabel.Name = "logInfoLabel";
             this.logInfoLabel.Size = new System.Drawing.Size(32, 17);
             this.logInfoLabel.TabIndex = 8;
@@ -130,7 +131,7 @@
             // filePathLabel
             // 
             this.filePathLabel.AutoSize = true;
-            this.filePathLabel.Location = new System.Drawing.Point(673, 417);
+            this.filePathLabel.Location = new System.Drawing.Point(644, 417);
             this.filePathLabel.Name = "filePathLabel";
             this.filePathLabel.Size = new System.Drawing.Size(105, 17);
             this.filePathLabel.TabIndex = 11;
@@ -139,7 +140,7 @@
             // fileInfoLabel
             // 
             this.fileInfoLabel.AutoSize = true;
-            this.fileInfoLabel.Location = new System.Drawing.Point(633, 417);
+            this.fileInfoLabel.Location = new System.Drawing.Point(604, 417);
             this.fileInfoLabel.Name = "fileInfoLabel";
             this.fileInfoLabel.Size = new System.Drawing.Size(34, 17);
             this.fileInfoLabel.TabIndex = 12;
@@ -153,13 +154,14 @@
             this.chooseFileButton.TabIndex = 14;
             this.chooseFileButton.Text = "Choose file";
             this.chooseFileButton.UseVisualStyleBackColor = true;
+            this.chooseFileButton.Click += new System.EventHandler(this.ChooseFileButton_Click);
             // 
             // logRichTextBox
             // 
             this.logRichTextBox.Location = new System.Drawing.Point(479, 65);
             this.logRichTextBox.Name = "logRichTextBox";
             this.logRichTextBox.ReadOnly = true;
-            this.logRichTextBox.Size = new System.Drawing.Size(380, 324);
+            this.logRichTextBox.Size = new System.Drawing.Size(544, 324);
             this.logRichTextBox.TabIndex = 15;
             this.logRichTextBox.Text = "";
             // 
@@ -168,7 +170,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.LightSkyBlue;
-            this.ClientSize = new System.Drawing.Size(900, 526);
+            this.ClientSize = new System.Drawing.Size(1050, 514);
             this.Controls.Add(this.logRichTextBox);
             this.Controls.Add(this.chooseFileButton);
             this.Controls.Add(this.fileInfoLabel);
@@ -182,8 +184,6 @@
             this.Controls.Add(this.pairButton);
             this.Controls.Add(this.searchButton);
             this.Controls.Add(this.foundDevicesListBox);
-            this.MaximumSize = new System.Drawing.Size(918, 573);
-            this.MinimumSize = new System.Drawing.Size(918, 573);
             this.Name = "BluetoothForm";
             this.Text = "Bluetooth";
             this.ResumeLayout(false);

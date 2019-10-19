@@ -1,15 +1,18 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Windows.Forms;
 using InTheHand.Net.Sockets;
+using InTheHand.Net;
 
 namespace Bluetooth
 {
     public partial class BluetoothForm : Form
     {
         private readonly BluetoothManager bluetoothManager;
+        private string UserFilePath { get; set; }
 
         public BluetoothForm()
         {
@@ -17,11 +20,13 @@ namespace Bluetooth
 
             bluetoothManager = new BluetoothManager();
 
+            UserFilePath = string.Empty;
+
             this.foundDevicesListBox.DisplayMember = "DeviceName";
-            this.foundDevicesListBox.ValueMember = null;
+            this.foundDevicesListBox.ValueMember = "DeviceAddress";
 
             this.pairedDevicesListBox.DisplayMember = "DeviceName";
-            this.pairedDevicesListBox.ValueMember = null;
+            this.pairedDevicesListBox.ValueMember = "DeviceAddress";
         }
 
         #region Callback methods
@@ -30,12 +35,12 @@ namespace Bluetooth
             this.searchButton.Enabled = false;
             Log("Scanning area for Bluetooth devices...");
 
-            Task<int> task = new Task<int>(() => bluetoothManager.DiscoverDevices(64, true, true, true, false));
+            Task<BluetoothDeviceInfo[]> task = new Task<BluetoothDeviceInfo[]>(() => bluetoothManager.DiscoverDevices(64, true, true, true, false));
             task.ContinueWith(searchTask =>
             {
-                this.foundDevicesListBox.DataSource = bluetoothManager.Devices;
+                this.foundDevicesListBox.DataSource = searchTask.Result;
                 Log("completed!", true);
-                Log("Found " + searchTask.Result + " device(s)", true);
+                Log("Found " + searchTask.Result.Length + " device(s)", true);
                 this.searchButton.Enabled = true;
             },
             TaskScheduler.FromCurrentSynchronizationContext());
@@ -53,8 +58,9 @@ namespace Bluetooth
             }
             string deviceName = ((BluetoothDeviceInfo)foundDevicesListBox.SelectedItem).DeviceName;
             Log("Pairing with device \"" + deviceName + "\"...");
+            BluetoothAddress deviceAddress = (BluetoothAddress)foundDevicesListBox.SelectedValue;
 
-            Task<bool> task = new Task<bool>(() => bluetoothManager.PairDevice(deviceName));
+            Task<bool> task = new Task<bool>(() => bluetoothManager.PairDevice(deviceAddress));
             task.ContinueWith(pairDeviceTask =>
             {
                 this.pairedDevicesListBox.DataSource = bluetoothManager.Devices.Where(deviceInfo => deviceInfo.Authenticated).ToArray();
@@ -76,8 +82,9 @@ namespace Bluetooth
             }
             string deviceName = ((BluetoothDeviceInfo)pairedDevicesListBox.SelectedItem).DeviceName;
             Log("Unpairing device \"" + deviceName + "\"...");
+            BluetoothAddress deviceAddress = (BluetoothAddress)pairedDevicesListBox.SelectedValue;
 
-            Task<bool> task = new Task<bool>(() => bluetoothManager.UnpairDevice(deviceName));
+            Task<bool> task = new Task<bool>(() => bluetoothManager.UnpairDevice(deviceAddress));
             task.ContinueWith(unpairDeviceTask =>
             {
                 this.pairedDevicesListBox.DataSource = bluetoothManager.Devices.Where(deviceInfo => deviceInfo.Authenticated).ToArray();
@@ -86,6 +93,67 @@ namespace Bluetooth
 
             }, TaskScheduler.FromCurrentSynchronizationContext());
             task.Start();
+        }
+
+        private void ChooseFileButton_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.InitialDirectory = "C:\\Users\\plona\\Desktop\\BluetoothTest";
+                openFileDialog.Filter = "Image files (*.BMP;*.JPG;*.GIF)|*.BMP;*.JPG;*.GIF|Text files (*.txt)|*.txt|All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 3;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    UserFilePath = openFileDialog.FileName;
+                    this.filePathLabel.Text = openFileDialog.FileName.Split('\\').Last();
+                }
+                else
+                {
+                    UserFilePath = string.Empty;
+                    this.filePathLabel.Text = "No file selected";
+                }
+            }
+        }
+
+        private void SendFileButton_Click(object sender, EventArgs e)
+        {
+            this.sendFileButton.Enabled = false;
+            if (UserFilePath.Equals(string.Empty))
+            {
+                MessageBox.Show("Please choose a file to send.", "No file selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.sendFileButton.Enabled = true;
+                return;
+            }
+            if (pairedDevicesListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Select a device and try again.", "No device selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.sendFileButton.Enabled = true;
+                return;
+            }
+            Log("Sending " + UserFilePath.Split('\\').Last() + " to device " +
+                ((BluetoothDeviceInfo)this.pairedDevicesListBox.SelectedItem).DeviceName + "...");
+
+            BluetoothAddress deviceAddress = (BluetoothAddress)this.pairedDevicesListBox.SelectedValue;
+            Task<ObexStatusCode> task = new Task<ObexStatusCode>(() =>
+               bluetoothManager.SendFile(deviceAddress, UserFilePath));
+            task.ContinueWith(sendFileTask =>
+            {
+                if ((int)sendFileTask.Result == (int)ObexStatusCode.OK + (int)ObexStatusCode.Final
+                || sendFileTask.Result == ObexStatusCode.OK || sendFileTask.Result == ObexStatusCode.Final)
+                {
+                    Log("completed");
+                }
+                else
+                {
+                    Log("failed");
+                }
+                Log("! [Status code: " + sendFileTask.Result + "]", true);
+                this.sendFileButton.Enabled = true;
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+            task.Start();
+
         }
 
         #endregion
@@ -101,8 +169,8 @@ namespace Bluetooth
 
         }
 
-        #endregion
 
+        #endregion
 
     }
 }

@@ -51,12 +51,12 @@ namespace Bluetooth
         /// <param name="remembered"></param>
         /// <param name="unknown"></param>
         /// <param name="discoverableOnly"></param>
-        /// <returns>Number of found devices</returns>
-        public int DiscoverDevices(int maxDevices, bool authenticated, bool remembered,
+        /// <returns>Array of BluetoothDeviceInfo objects ready to link to the UI element</returns>
+        public BluetoothDeviceInfo[] DiscoverDevices(int maxDevices, bool authenticated, bool remembered,
             bool unknown, bool discoverableOnly = false)
         {
             Devices = bluetoothClient.DiscoverDevices(maxDevices, authenticated, remembered, unknown, discoverableOnly);
-            return Devices.Length;
+            return Devices;
         }
 
         /// <summary>
@@ -71,6 +71,11 @@ namespace Bluetooth
             return BluetoothSecurity.PairRequest(deviceInfo.DeviceAddress, pin);
         }
 
+        public bool PairDevice(BluetoothAddress deviceAdress, string pin = "0000")
+        {
+            return BluetoothSecurity.PairRequest(deviceAdress, pin);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -82,5 +87,24 @@ namespace Bluetooth
             return BluetoothSecurity.RemoveDevice(deviceInfo.DeviceAddress);
         }
 
+        public bool UnpairDevice(BluetoothAddress deviceAdress)
+        {
+            return BluetoothSecurity.RemoveDevice(deviceAdress);
+        }
+
+        public ObexStatusCode SendFile(BluetoothAddress deviceAddress, string filePath)
+        {
+            BluetoothDeviceInfo device = Devices.Where((_device) => _device.DeviceAddress == deviceAddress).First();
+            device.SetServiceState(BluetoothService.ObexObjectPush, true);
+
+            Uri uri = new Uri("obex://" + deviceAddress + "//" + filePath);
+            ObexWebRequest request = new ObexWebRequest(uri);
+            request.ReadFile(filePath);
+            ObexWebResponse response = (ObexWebResponse)request.GetResponse();
+            response.Close();
+
+            device.SetServiceState(BluetoothService.ObexObjectPush, false);
+            return response.StatusCode;
+        }
     }
 }
