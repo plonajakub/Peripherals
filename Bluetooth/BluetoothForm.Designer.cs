@@ -41,6 +41,7 @@
             this.fileInfoLabel = new System.Windows.Forms.Label();
             this.chooseFileButton = new System.Windows.Forms.Button();
             this.logRichTextBox = new System.Windows.Forms.RichTextBox();
+            this.reciveFileButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // foundDevicesListBox
@@ -165,12 +166,23 @@
             this.logRichTextBox.TabIndex = 15;
             this.logRichTextBox.Text = "";
             // 
+            // reciveFileButton
+            // 
+            this.reciveFileButton.Location = new System.Drawing.Point(276, 396);
+            this.reciveFileButton.Name = "reciveFileButton";
+            this.reciveFileButton.Size = new System.Drawing.Size(97, 38);
+            this.reciveFileButton.TabIndex = 16;
+            this.reciveFileButton.Text = "Recive file";
+            this.reciveFileButton.UseVisualStyleBackColor = true;
+            this.reciveFileButton.Click += new System.EventHandler(this.ReciveFileButton_Click);
+            // 
             // BluetoothForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.LightSkyBlue;
             this.ClientSize = new System.Drawing.Size(1050, 514);
+            this.Controls.Add(this.reciveFileButton);
             this.Controls.Add(this.logRichTextBox);
             this.Controls.Add(this.chooseFileButton);
             this.Controls.Add(this.fileInfoLabel);
@@ -206,6 +218,7 @@
         private System.Windows.Forms.Label fileInfoLabel;
         private System.Windows.Forms.Button chooseFileButton;
         private System.Windows.Forms.RichTextBox logRichTextBox;
+        private System.Windows.Forms.Button reciveFileButton;
     }
 }
 

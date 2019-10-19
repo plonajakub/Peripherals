@@ -106,5 +106,18 @@ namespace Bluetooth
             device.SetServiceState(BluetoothService.ObexObjectPush, false);
             return response.StatusCode;
         }
+
+        //TODO Split server functionalities into distinguishable methods
+        public void ReciveFile()
+        {
+            ObexListener listener = new ObexListener(ObexTransport.Bluetooth);
+            listener.Start();
+            ObexListenerContext ctx = listener.GetContext();
+            ObexListenerRequest req = ctx.Request;
+            String[] pathSplits = req.RawUrl.Split('/');
+            String file = pathSplits[pathSplits.Length - 1];
+            req.WriteFile(file);
+            listener.Stop();
+        }
     }
 }

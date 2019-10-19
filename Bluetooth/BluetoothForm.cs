@@ -156,6 +156,16 @@ namespace Bluetooth
 
         }
 
+        // TODO Rework button to be able to start and stop a Bluetooth server
+        private void ReciveFileButton_Click(object sender, EventArgs e)
+        {
+            Task task = new Task(() =>
+            {
+                bluetoothManager.ReciveFile();
+            });
+            task.Start();
+        }
+
         #endregion
 
         #region Helpers
@@ -172,5 +182,6 @@ namespace Bluetooth
 
         #endregion
 
+        
     }
 }
