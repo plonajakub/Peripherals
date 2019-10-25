@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using InTheHand.Net.Sockets;
 using InTheHand.Net;
+using InTheHand.Net.Bluetooth;
 
 namespace Bluetooth
 {
@@ -56,17 +57,29 @@ namespace Bluetooth
                 this.pairButton.Enabled = true;
                 return;
             }
-            string deviceName = ((BluetoothDeviceInfo)foundDevicesListBox.SelectedItem).DeviceName;
-            Log("Pairing with device \"" + deviceName + "\"...");
-            BluetoothAddress deviceAddress = (BluetoothAddress)foundDevicesListBox.SelectedValue;
+            BluetoothDeviceInfo device = (BluetoothDeviceInfo)foundDevicesListBox.SelectedItem;
+            Log("Pairing with device \"" + device.DeviceName + "\"...");
 
-            Task<bool> task = new Task<bool>(() => bluetoothManager.PairDevice(deviceAddress));
+            Task<bool> task = new Task<bool>(() => bluetoothManager.PairDevice(device.DeviceAddress));
             task.ContinueWith(pairDeviceTask =>
             {
                 this.pairedDevicesListBox.DataSource = bluetoothManager.Devices.Where(deviceInfo => deviceInfo.Authenticated).ToArray();
                 Log(((pairDeviceTask.Result) ? "completed" : "failed") + "!", true);
+                Log("Available services: ", true);
+                device.Refresh();
+                foreach (var service in device.InstalledServices)
+                {
+                    Log(" * ");
+                    string serviceName = BluetoothService.GetName(service);
+                    if (serviceName != null && !serviceName.Equals(string.Empty))
+                    {
+                        Log(serviceName, true);
+                    } else
+                    {
+                        Log(service.ToString(), true);
+                    }
+                }
                 this.pairButton.Enabled = true;
-
             }, TaskScheduler.FromCurrentSynchronizationContext());
             task.Start();
         }
@@ -117,6 +130,47 @@ namespace Bluetooth
             }
         }
 
+        // Version without ProgressBar update
+
+        //private void SendFileButton_Click(object sender, EventArgs e)
+        //{
+        //    this.sendFileButton.Enabled = false;
+        //    if (UserFilePath.Equals(string.Empty))
+        //    {
+        //        MessageBox.Show("Please choose a file to send.", "No file selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //        this.sendFileButton.Enabled = true;
+        //        return;
+        //    }
+        //    if (pairedDevicesListBox.SelectedItem == null)
+        //    {
+        //        MessageBox.Show("Select a device and try again.", "No device selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //        this.sendFileButton.Enabled = true;
+        //        return;
+        //    }
+        //    Log("Sending " + UserFilePath.Split('\\').Last() + " to device " +
+        //        ((BluetoothDeviceInfo)this.pairedDevicesListBox.SelectedItem).DeviceName + "...");
+
+        //    BluetoothAddress deviceAddress = (BluetoothAddress)this.pairedDevicesListBox.SelectedValue;
+        //    Task<ObexStatusCode> task = new Task<ObexStatusCode>(() =>
+        //       bluetoothManager.SendFile(deviceAddress, UserFilePath));
+        //    task.ContinueWith(sendFileTask =>
+        //    {
+        //        if ((int)sendFileTask.Result == (int)ObexStatusCode.OK + (int)ObexStatusCode.Final
+        //        || sendFileTask.Result == ObexStatusCode.OK || sendFileTask.Result == ObexStatusCode.Final)
+        //        {
+        //            Log("completed");
+        //        }
+        //        else
+        //        {
+        //            Log("failed");
+        //        }
+        //        Log("! [Status code: " + sendFileTask.Result + "]", true);
+        //        this.sendFileButton.Enabled = true;
+        //    }, TaskScheduler.FromCurrentSynchronizationContext());
+        //    task.Start();
+
+        //}
+
         private void SendFileButton_Click(object sender, EventArgs e)
         {
             this.sendFileButton.Enabled = false;
@@ -137,19 +191,10 @@ namespace Bluetooth
 
             BluetoothAddress deviceAddress = (BluetoothAddress)this.pairedDevicesListBox.SelectedValue;
             Task<ObexStatusCode> task = new Task<ObexStatusCode>(() =>
-               bluetoothManager.SendFile(deviceAddress, UserFilePath));
+               bluetoothManager.SendFile(deviceAddress, UserFilePath, this.sendFileProgressBar));
             task.ContinueWith(sendFileTask =>
             {
-                if ((int)sendFileTask.Result == (int)ObexStatusCode.OK + (int)ObexStatusCode.Final
-                || sendFileTask.Result == ObexStatusCode.OK || sendFileTask.Result == ObexStatusCode.Final)
-                {
-                    Log("completed");
-                }
-                else
-                {
-                    Log("failed");
-                }
-                Log("! [Status code: " + sendFileTask.Result + "]", true);
+                Log("finished [Status: " + sendFileTask.Result + "]", true);
                 this.sendFileButton.Enabled = true;
             }, TaskScheduler.FromCurrentSynchronizationContext());
             task.Start();
@@ -179,9 +224,6 @@ namespace Bluetooth
 
         }
 
-
         #endregion
-
-        
     }
 }

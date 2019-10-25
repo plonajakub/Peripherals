@@ -42,6 +42,7 @@
             this.chooseFileButton = new System.Windows.Forms.Button();
             this.logRichTextBox = new System.Windows.Forms.RichTextBox();
             this.reciveFileButton = new System.Windows.Forms.Button();
+            this.sendFileProgressBar = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
             // foundDevicesListBox
@@ -176,12 +177,20 @@
             this.reciveFileButton.UseVisualStyleBackColor = true;
             this.reciveFileButton.Click += new System.EventHandler(this.ReciveFileButton_Click);
             // 
+            // sendFileProgressBar
+            // 
+            this.sendFileProgressBar.Location = new System.Drawing.Point(479, 468);
+            this.sendFileProgressBar.Name = "sendFileProgressBar";
+            this.sendFileProgressBar.Size = new System.Drawing.Size(544, 23);
+            this.sendFileProgressBar.TabIndex = 17;
+            // 
             // BluetoothForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.LightSkyBlue;
             this.ClientSize = new System.Drawing.Size(1050, 514);
+            this.Controls.Add(this.sendFileProgressBar);
             this.Controls.Add(this.reciveFileButton);
             this.Controls.Add(this.logRichTextBox);
             this.Controls.Add(this.chooseFileButton);
@@ -219,6 +228,7 @@
         private System.Windows.Forms.Button chooseFileButton;
         private System.Windows.Forms.RichTextBox logRichTextBox;
         private System.Windows.Forms.Button reciveFileButton;
+        private System.Windows.Forms.ProgressBar sendFileProgressBar;
     }
 }
 
